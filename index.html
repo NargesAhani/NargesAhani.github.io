@@ -1,0 +1,666 @@
+
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+<script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+
+
+<style>
+	body {
+	  font: 9px sans-serif;
+	}
+
+	.tooltip {
+	  position: absolute;
+	  width: 200px;
+	  height: 28px;
+	  pointer-events: none;
+	}
+
+	.keeper {
+/*        overflow: hidden; */
+		
+    }
+
+    .keeper div {
+	   display: inline;
+/*       float: left;*/
+		
+/*       border: 1px solid red; */
+    }
+
+
+
+
+</style>
+
+
+
+<body>
+<!-- style="display: inline-block" -->
+	<div id="dates_legend_div"></div>
+	<div class="keeper">
+<!-- 	<div style="font-size: 13px">div1</div> -->
+<!-- 	<div style="font-size: 23px">div2</div> -->
+
+			<div id="dates_div"></div>
+			<div id="pie"></div>
+			
+
+			
+
+
+	</div>
+	
+</body>	
+
+
+<script>
+
+///////////////////////////////////////////////////////////////////SETUP
+
+// set the dimensions and margins of the graph
+var dates_margin = {top: 20, right: 10, bottom: 10, left: 75},
+    dates_width = 500 - dates_margin.left - dates_margin.right,
+    dates_height = 600 - dates_margin.top - dates_margin.bottom;
+
+// append the svg object to the body of the page
+var svg_dates = d3.select("#dates_div")
+  .append("svg")
+    .attr("width", dates_width + dates_margin.left + dates_margin.right)
+    .attr("height", dates_height + dates_margin.top + dates_margin.bottom)
+  .append("g")
+	   .attr("transform",
+          "translate(" + dates_margin.left + "," + dates_margin.top + ")");
+
+//legend setup
+var svg_legend_dates = d3.select("#dates_legend_div")
+  .append("svg")
+    .attr("width", 500)
+    .attr("height", 30)
+  .append("g")
+	   .attr("transform",
+          "translate(60,10)");
+
+
+var svg_pie_holder = d3.select("#pie")
+  .append("svg")
+    .attr("width", 900 + dates_margin.left + dates_margin.right)
+    .attr("height", dates_height + dates_margin.top + dates_margin.bottom)
+  .append("g")
+  .attr("class", "svg_pie_holder")
+
+
+var pie_width = 100;
+var	pie_height = 100;
+var scaler = 10;
+var row_counter = 9;
+
+// set the color scale for pie
+var policy1_color1 = "#ff0000"
+var policy1_color2 = '#ff4d4d' //"#ff9999"
+
+var policy2_color1 = "#ff9900"
+var policy2_color2 = '#b38f00' //"#ffcc80"
+
+var policy3_color1 = "#40ff00" //"#33cc33"
+var policy3_color2 = '#00cc66' // "#99e699"
+
+var policy4_color1 = "#00ccff"
+var policy4_color2 = '#3399ff' //"#80ccff"
+
+var policy5_color1 = "#ff00ff"
+var policy5_color2 = '#ff66d9' //"#ff80ff"
+
+var total_color1 = "#4d4d4d"
+var total_color2 = "#bfbfbf"
+
+
+
+var policy_color_list = [policy1_color2,policy2_color2,policy3_color2,policy4_color2,policy5_color2]
+
+var tip = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+
+
+/////////////////////////////////////////////////////////////////// LOAD DATA
+d3.queue()
+  .defer(d3.csv, "final_data.csv")
+  .await(ready);
+
+//enactment dates start from March 11th (colum index=54) to April 7th
+function ready(error, data) { 
+//
+//	console.log(data);
+//
+
+	show_enactment_dates(data);
+	show_pie(data);
+
+
+}
+
+
+////////////////////////////////////////////////////////////////////////// 
+function show_enactment_dates(data){
+
+
+	////variable setup
+	policy_list = ['Mass gathering restrictions','Initial business closure','Educational facilities closed','Non-essential services closed','Stay at home order']
+
+	var color = d3.scaleOrdinal()
+		.domain(policy_list)
+		.range(policy_color_list)
+//		.range([ '#ff4d4d', '#b38f00', '#00cc66', '#3399ff' ,'#ff66d9'])
+
+
+	//////////////////////////////////////////////legend
+	var start_point = 10
+	var offset = 150
+	var text_offset = 8
+	// Add one dot in the legend for each name.
+	svg_legend_dates.selectAll("mydots")
+	  .data(policy_list)
+	  .enter()
+	  .append("circle")
+		.attr("cx", function(d,i){ return offset*parseInt(i/2)}) 
+		.attr("cy", function(d,i){ return start_point*(i%2)}) 
+		.attr("r", 2.5)
+		.style("fill", function(d){ return color(d)})
+		.attr("fill-opacity", 1)
+		;
+
+
+	// Add one dot in the legend for each name.
+	svg_legend_dates.selectAll("mylabels")
+	  .data(policy_list)
+	  .enter()
+	  .append("text")
+		.attr("x", function(d,i){ return  text_offset + offset*parseInt(i/2)})
+		.attr("y", function(d,i){ return  start_point*(i%2)}) 
+		.style("fill", function(d){ return color(d)})
+		.text(function(d){ return d})
+		.attr("text-anchor", "left")
+		.style("alignment-baseline", "central")
+		.style("font-size", "9px")
+
+
+
+	////////////////////////////////////////////////X axis
+	x_axis_domain = data.columns.slice(54, 54+28)
+	var tick_dates = {'3/11/2020':'MAR. 11','3/14/2020':'MAR. 14','3/17/2020':'MAR. 17','3/20/2020':'MAR. 20','3/23/2020':'MAR. 23',
+	'3/26/2020':'MAR. 26', '3/29/2020':'MAR. 29','4/1/2020':'APR. 1', '4/4/2020':'APR. 4', '4/7/2020':'APR. 7'}
+	
+
+	var x = d3.scaleBand()
+		.domain(x_axis_domain)
+		.range([ 0, dates_width])
+		;
+	
+	//------// text on x axis
+	var x_Axis_text = svg_dates.append("g")
+		.attr("class", "x_Axis");
+
+	x_Axis_text.call(d3.axisTop(x)
+		.tickValues(Object.keys(tick_dates))
+		.tickFormat(function(d){ return tick_dates[d]}))
+		.select(".domain").remove()	
+		;
+
+	x_Axis_text.selectAll("text")
+		.attr("transform", "translate(0,0)rotate(0)")
+		.style("text-anchor", "middle")
+		.style("font-size", "7px")
+		.attr("font-style", "italic")
+		.attr("fill", "gray");
+		;
+
+
+	//------// ticks on x axis
+	var x_Axis_ticks = svg_dates.append("g")
+		.attr("class", "x_Axis");
+
+	x_Axis_ticks.call(d3.axisTop(x)
+		.tickFormat("")
+		.tickSize(-dates_height)) // make ticks long
+		.select(".domain").remove()
+		;
+
+
+
+//	 reduce the opacity of long X ticks
+	d3.selectAll(".x_Axis .tick line")
+		.attr("stroke-opacity", 0.1)
+		.style("stroke-dasharray", "2,2")
+		.style("stroke-width", "0.8px")
+	;
+
+
+
+	//////////////////////////////////////////////Y axis
+	var y = d3.scaleBand()
+		.domain(data.map(d => d.State))
+		.range([ 0, dates_height])
+		;
+
+	var y_Axis = svg_dates.append("g")
+//		.attr("transform", "translate(0," + 3*dates_margin.top + ")")
+		.call(d3.axisLeft(y).tickSize(-dates_width)) // make ticks long
+		;
+
+	// text on axis
+	y_Axis.selectAll("text")
+		.attr("transform", "translate(0,0)rotate(0)")
+		.style("text-anchor", "end")
+		.style("font-size", "8px")
+		.attr("fill", "gray");
+		;
+
+
+	// remove borders of X axis
+	y_Axis.select(".domain").remove()
+	;
+
+	// reduce the opacity of long X ticks
+	y_Axis.selectAll(".tick line").attr("stroke-opacity", 0.1).style("stroke-width", "0.5px")
+	;
+
+
+	//////// dots
+		
+	for (i = 0; i < policy_list.length; i++){
+	svg_dates
+		.selectAll("dot")
+		.data(data)
+		.enter()
+		//.defined(d => !isNaN(d.value))
+		.append("circle")
+		.attr("id" , "policy")
+		.attr("class", "policy_"+(i+1).toString())
+		.attr("cx", function(d){ 
+			var padding = 0;
+			padding_list = [0,1,-1,2,-2]
+			for (j = 0; j < i; j++){
+				if (d[policy_list[i]] == d[policy_list[j]])
+				{
+					padding += 1;
+				}
+			}
+			return x(d[policy_list[i]])+x.bandwidth()/2+3*padding_list[padding]
+		})
+		.attr("cy", function(d){ return y(d.State)+y.bandwidth()/2 })
+		.attr("r", '2.5px')
+		//		.attr("r", function(d){ return size(d.Weight) })
+		.attr("fill", color(policy_list[i]))
+		.attr("fill-opacity", 1)
+		.attr("visibility" , function(d){
+			if (isNaN(d[policy_list[i]]))
+			{ return 'visible';}
+			else
+			{return 'hidden';}
+		})
+		.on("mouseover", function(d,i){
+			d3.selectAll("#policy")
+			  .transition()
+			  .duration(200)
+			  .style("opacity", .15)
+
+			var calss_name = d3.select(this).attr("class")
+			d3.selectAll('.'+calss_name)
+			  .transition()
+			  .duration(200)
+			  .style("opacity", 1)
+
+			state_name = "state_"+(i).toString()
+			d3.select('.'+state_name)
+			  .attr("style", "outline:thin solid #c6bcb6;") 
+			  .attr("outline-offset" , "2px")
+      			
+		})
+		.on("mouseout", function(d,i){
+			d3.selectAll("#policy")
+			  .transition()
+			  .duration(200)
+			  .style("opacity", 1)
+
+			state_name = "state_"+(i).toString()
+			d3.select('.'+state_name)
+			  .attr("style", "outline: none") 
+			
+		})
+		;
+
+	}
+
+}
+
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
+function show_pie(data){
+	var tooltip = d3.select("body").append("svg")
+		.attr("class", "tooltip")
+		.style("opacity", 0);
+	
+//	var svg_pie = d3.select("#pie")
+	var svg_pie = d3.select(".svg_pie_holder")
+		.selectAll("UniquePie")
+		.data(data)
+		.enter()
+		.append("g")
+		.attr("class", function(d,i) { return "state_"+(i).toString() })
+		.attr("width", pie_width)
+		.attr("height", pie_height)
+		.append("g")
+		.attr("transform", function(d,i){
+//			console.log(i)
+			return "translate(" + ((pie_height*(i%row_counter))+pie_width/2) + "," + ((pie_width*parseInt(i/row_counter))+pie_height/2) +")" })
+		
+		;
+	
+	svg_pie.append("circle")
+		.attr("r", function(d){return total_scale(d["5/1/2020"])*scaler})
+		.style("fill", total_color2)
+		.style("opacity", 0.5)
+		.on("mouseover", function(d){
+			tip.transition()        
+                .duration(200)      
+                .style("opacity", .9);
+			tip.html("Total case : "+d["5/1/2020"])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
+				})
+		.on("mouseout", function(d) {  
+            tip.transition()        
+                .duration(500)      
+                .style("opacity", 0)
+				});
+		
+	
+	svg_pie.append("path")
+//		.attr("class", "arc1")
+		.attr("id" , "policy")
+		.attr("class", "policy_1")
+		.attr("fill", policy1_color2)
+		.attr("stroke-width", 3)
+		.attr("stroke", "none")
+		.attr("d", function(d){
+			return d3.arc()
+			.startAngle(45 * (Math.PI/180))
+			.endAngle(80 * (Math.PI/180))
+			.innerRadius(0)
+			.outerRadius(pol1(d.after_policy1)*scaler)(data)})
+		.on("mouseover", function(d){
+			d3.select(this)
+            	.attr("fill", policy1_color1)
+			tip.transition()        
+                .duration(200)      
+                .style("opacity", .9);
+			tip.html("Policy1 : "+d.after_policy1)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
+				})
+		.on("mouseout", function(d) {   
+			d3.select(this)
+            	.attr("fill", policy1_color2)
+            tip.transition()        
+                .duration(500)      
+                .style("opacity", 0)
+				});
+				
+	svg_pie.append("path")
+//		.attr("class", "arc2")
+		.attr("id" , "policy")
+		.attr("class", "policy_2")
+		.attr("fill", policy2_color2)
+		.attr("stroke-width", 3)
+		.attr("stroke", "none")
+		.attr("d", function(d){
+			return d3.arc()
+			.startAngle(81 * (Math.PI/180))
+			.endAngle(116 * (Math.PI/180))
+			.innerRadius(0)
+			.outerRadius(pol2(d.after_policy2)*scaler)(data)})
+		.on("mouseover", function(d){
+			d3.select(this)
+            	.attr("fill", policy2_color1)
+			tip.transition()        
+                .duration(200)      
+                .style("opacity", .9);
+			tip.html("Policy2 : "+d.after_policy2)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
+				})
+		.on("mouseout", function(d) {  
+			d3.select(this)
+            	.attr("fill", policy2_color2)
+            tip.transition()        
+                .duration(500)      
+                .style("opacity", 0)
+				});
+		
+	svg_pie.append("path")
+//		.attr("class", "arc3")
+		.attr("id" , "policy")
+		.attr("class", "policy_3")
+		.attr("fill", policy3_color2)
+		.attr("stroke-width", 3)
+		.attr("stroke", "none")
+		.attr("d", function(d){
+			return d3.arc()
+			.startAngle(117 * (Math.PI/180))
+			.endAngle(152 * (Math.PI/180))
+			.innerRadius(0)
+			.outerRadius(pol3(d.after_policy3)*scaler)(data)})
+		.on("mouseover", function(d){
+			d3.select(this)
+            	.attr("fill", policy3_color1)
+			tip.transition()        
+                .duration(200)      
+                .style("opacity", .9);
+			tip.html("Policy3 : "+d.after_policy3)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
+				})
+		.on("mouseout", function(d) { 
+			d3.select(this)
+            	.attr("fill", policy3_color2)
+            tip.transition()        
+                .duration(500)      
+                .style("opacity", 0)
+				});
+				
+	svg_pie.append("path")
+//		.attr("class", "arc4")
+		.attr("id" , "policy")
+		.attr("class", "policy_4")
+		.attr("fill", policy4_color2)
+		.attr("stroke-width", 3)
+		.attr("stroke", "none")
+		.attr("d", function(d){
+			return d3.arc()
+			.startAngle(153 * (Math.PI/180))
+			.endAngle(189 * (Math.PI/180))
+			.innerRadius(0)
+			.outerRadius(pol4(d.after_policy4)*scaler)(data)})
+		.on("mouseover", function(d){
+			d3.select(this)
+            	.attr("fill", policy4_color1)
+			tip.transition()        
+                .duration(200)      
+                .style("opacity", .9);
+			tip.html("Policy4 : "+d.after_policy4)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
+				})
+		.on("mouseout", function(d) { 
+			d3.select(this)
+            	.attr("fill", policy4_color2)
+            tip.transition()        
+                .duration(500)      
+                .style("opacity", 0)
+				});
+				
+	svg_pie.append("path")
+//		.attr("class", "arc5")
+		.attr("id" , "policy")
+		.attr("class", "policy_5")
+		.attr("fill", policy5_color2)
+		.attr("stroke-width", 3)
+		.attr("stroke", "none")
+		.attr("d", function(d){
+			return d3.arc()
+			.startAngle(190 * (Math.PI/180))
+			.endAngle(225 * (Math.PI/180))
+			.innerRadius(0)
+			.outerRadius(pol5(d.after_policy5)*scaler)(data)})
+		.on("mouseover", function(d){
+			d3.select(this)
+            	.attr("fill", policy5_color1)
+			tip.transition()        
+                .duration(200)      
+                .style("opacity", .9);
+			tip.html("Policy 5 :"+d.after_policy5)  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 28) + "px");
+				})
+		.on("mouseout", function(d) { 
+			d3.select(this)
+            	.attr("fill", policy5_color2)
+            tip.transition()        
+                .duration(500)      
+                .style("opacity", 0)
+				});
+			
+	var tick1 = d3.arc()
+		.outerRadius(scaler*1)
+		.innerRadius(0)
+		.startAngle(45 * (Math.PI/180))
+		.endAngle(225 * (Math.PI/180));
+	
+	var tick2 = d3.arc()
+		.outerRadius(scaler*2)
+		.innerRadius(0)
+		.startAngle(45 * (Math.PI/180))
+		.endAngle(225 * (Math.PI/180));
+	
+	var tick3 = d3.arc()
+		.outerRadius(scaler*3)
+		.innerRadius(0)
+		.startAngle(45 * (Math.PI/180))
+		.endAngle(225 * (Math.PI/180));
+	
+	var tick4 = d3.arc()
+		.outerRadius(scaler*4)
+		.innerRadius(0)
+		.startAngle(45 * (Math.PI/180))
+		.endAngle(225 * (Math.PI/180));
+	
+	var tick5 = d3.arc()
+		.outerRadius(scaler*5)
+		.innerRadius(0)
+		.startAngle(45 * (Math.PI/180))
+		.endAngle(225 * (Math.PI/180));
+	
+	svg_pie.append("path")
+		.attr("class", "arc")
+		.attr("d", tick1)
+		.style("fill", "none")
+		.style("stroke", "white");
+
+	svg_pie.append("path")
+		.attr("class", "arc")
+		.attr("d", tick2)
+		.style("fill", "none")
+		.style("stroke", "white");
+	
+	svg_pie.append("path")
+		.attr("class", "arc")
+		.attr("d", tick3)
+		.style("fill", "none")
+		.style("stroke", "white");
+	
+	svg_pie.append("path")
+		.attr("class", "arc")
+		.attr("d", tick4)
+		.style("fill", "none")
+		.style("stroke", "white");	
+	
+	svg_pie.append("path")
+		.attr("class", "arc")
+		.attr("d", tick5)
+		.style("fill", "none")
+		.style("stroke", "white");	
+	
+	svg_pie.append("text")
+		.attr("y", -30)
+		.text(function(d) { return d.State })
+		.style("font-size", "10px")
+		.attr("fill", "gray")
+		.style('text-anchor','middle');
+}
+	
+
+
+function pol1(val) {
+	if (val > 20){ return 5;} 
+	else if (val>10 && val <= 20){ return 4;}
+	else if (val>5 && val <= 10){ return 3;}
+	else if (val>2.5 && val <= 5){ return 2;}
+	else if (val>0 && val <= 2.5){ return 1;}
+	else {return val}
+}
+
+function pol2(val) {
+	if (val > 10){ return 5;} 
+	else if (val>5 && val <= 10){ return 4;}
+	else if (val>2.5 && val <= 5){ return 3;}
+	else if (val>1.25 && val <= 2.5){ return 2;}
+	else if (val>0 && val <= 1.25){ return 1;}
+	else {return val}
+}
+
+function pol3(val) {
+	if (val > 20){ return 5;} 
+	else if (val>10 && val <= 20){ return 4;}
+	else if (val>5 && val <= 10){ return 3;}
+	else if (val>2.5 && val <= 5){ return 2;}
+	else if (val>0 && val <= 2.5){ return 1;}
+	else {return val}
+}
+
+function pol4(val) {
+	if (val > 6){ return 5;} 
+	else if (val>4 && val <= 6){ return 4;}
+	else if (val>2 && val <= 4){ return 3;}
+	else if (val>1 && val <= 2){ return 2;}
+	else if (val>0 && val <= 1){ return 1;}
+	else {return val}
+}
+
+function pol5(val) {
+	if (val > 6){ return 5;} 
+	else if (val>4 && val <= 6){ return 4;}
+	else if (val>2 && val <= 4){ return 3;}
+	else if (val>1 && val <= 2){ return 2;}
+	else if (val>0 && val <= 1){ return 1;}
+	else {return val}
+}
+
+function total_scale(val) {
+	if (val > 100000){ return 5;} 
+	else if (val>50000 && val <= 100000){ return 4;}
+	else if (val>10000 && val <= 50000){ return 3;}
+	else if (val>1000 && val <= 10000){ return 2;}
+	else if (val>0 && val <= 1000){ return 1;}
+	else {return val}
+}
+
+function round_up(val) { return Math.round(val * 100) / 100}
+
+</script>
