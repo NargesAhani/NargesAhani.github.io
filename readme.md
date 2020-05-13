@@ -7,6 +7,7 @@
 ### Link to Data: http://NargesAhani.github.io/final_data.csv
 
 
+
 ![](img/pic_0.PNG)
 
 In late 2019, Coronavirus and the disease caused by it, COVID-19 started to grow rapidly around the world. World Health Organization declared it a pandemic on March 11th, 2020 and many countries including United States declared the State of Emergency afterward.
