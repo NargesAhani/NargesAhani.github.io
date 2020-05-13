@@ -38,18 +38,18 @@ To calculate the variance, we come up with our own measure called “ratio of in
 
 ![](img/pic_2.PNG)
 
-For example, ratio of increase equals 1 means that the number of confirmed cases were double one week after enacting a policy and 2 means it tripled
+For example, ratio of increase equals 1 means that the number of confirmed cases were double one week after enacting a policy and 2 means it tripled.
 
-Here we have all states shown as half pie charts and for each state we have 5 slices for the 5 policies. The length of each slice shows the ratio of increase for corresponding policy
+Here we have all states shown as half pie charts and for each state we have 5 slices for the 5 policies. The length of each slice shows the ratio of increase for corresponding policy.
 
 ![](img/pic_3.PNG)
 
-Hovering on dots on the left panel, only the data associated with that policy pops up in the entire graph. In this way we can compare different states to see if enacting that policy earlier or later effected on the ratio of increase shown at right graph
+Hovering on dots on the left panel, only the data associated with that policy pops up in the entire graph. In this way we can compare different states to see if enacting that policy, earlier or later, effected on the ratio of increase shown at right graph.
 
 ![](img/pic_4.PNG)
 
 After exploring in the visualized data, we conclude that there is no significant effect, neither positive nor negative, between the enactment time of policies and the spread of the virus in different states.
-This implies that more or less states took action at the right time, and other natural factors such as population, density or lifestyle in states, had the major effect on the spread of virus
+This implies that, more or less, states took action at the right time, and other natural factors such as population, density or lifestyle in states, had the major effect on the spread of virus.
  
 
 
