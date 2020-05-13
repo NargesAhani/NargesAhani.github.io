@@ -3,7 +3,7 @@
 
 ### Link to Project Visualization: http://NargesAhani.github.io/index.html
 ### Link to Project Screen-Cast: https://www.youtube.com/watch?v=gqzsABTkHcU
-### Link to https://github.com/NargesAhani/NargesAhani.github.io/blob/master/CS%20573%20Process%20Book.pdf
+### Link to Project Process Book: http://NargesAhani.github.io/ProcessBook.pdf
 
 ![](img/pic_0.PNG)
 
