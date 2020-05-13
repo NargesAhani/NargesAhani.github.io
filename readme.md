@@ -4,6 +4,8 @@
 ### Link to Project Visualization: http://NargesAhani.github.io/index.html
 ### Link to Project Screen-Cast: https://www.youtube.com/watch?v=gqzsABTkHcU
 ### Link to Project Process Book: http://NargesAhani.github.io/ProcessBook.pdf
+### Link to Data: http://NargesAhani.github.io/final_data.csv
+
 
 ![](img/pic_0.PNG)
 
