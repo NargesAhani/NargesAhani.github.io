@@ -11,20 +11,31 @@
 /*	  font: 9px sans-serif;*/
 	
 	}
+/*	.tooltip {*/
+/*		position: absolute;*/
+/*		text-align: center;*/
+/*		width: 71px;*/
+/*		height: 24px;*/
+/*		padding: 8px;*/
+/*		margin-top: -20px;*/
+/*		font: 12px sans-serif;*/
+/*		color: #fff;*/
+/*		background: black;*/
+/*		pointer-events: none;*/
+/*	}*/
+
 	.tooltip {
 		position: absolute;
 		text-align: center;
-		width: 71px;
-		height: 24px;
-		padding: 8px;
-		margin-top: -20px;
-		font: 12px sans-serif;
+		width: 5vh;
+		height: 3vh;
+		padding: 1hv;
+		margin-top: -1hv;
+		font: 2vh sans-serif;
 		color: #fff;
 		background: black;
 		pointer-events: none;
 	}
-
-
 
 
     .title1 {
