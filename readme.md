@@ -1,8 +1,9 @@
 ## Analyzing the Effect of Social Distancing Policies Enactment Time on Spread of COVID-19
 ### By Narges Ahani and Amorn Chokchaisiripakdee, Worcester Polytechnic Institute
 
-### link to Project Visualization: http://NargesAhani.github.io/index.html
-### link to Project Screen-Cast: https://www.youtube.com/watch?v=gqzsABTkHcU
+### Link to Project Visualization: http://NargesAhani.github.io/index.html
+### Link to Project Screen-Cast: https://www.youtube.com/watch?v=gqzsABTkHcU
+### Link to https://github.com/NargesAhani/NargesAhani.github.io/blob/master/CS%20573%20Process%20Book.pdf
 
 ![](img/pic_0.PNG)
 
