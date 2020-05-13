@@ -9,31 +9,32 @@ In late 2019, Coronavirus and the disease caused by it, COVID-19 started to grow
 
 In the absence of a vaccine or an effective treatment, the only way for governments to slow down the spread of the virus is to put aggressive actions and policies aimed at reducing the contact of people and scaling down the likelihood that the virus is transmitted from person to person.
 
-States have taken several actions at different points of time. So, Our main questions are: 
+States have taken several actions at different points of time. So, our main questions are: 
 	Is the time of enacting a policy really effect on the spread of virus? 
 	Is it true that states which reacted later had more difficulties on controlling the 	disease compared to others?
 
-The policies that we studied in this project are
-1. mandatory stay at home orders, 
-2. closures of non-essential businesses,
-3. bans on large gatherings,
-4. school closures, 
-5. and limits on bars and restaurants 
+The policies that we studied in this project are:
+1. Mandatory stay at home orders 
+2. Closures of non-essential businesses
+3. bans on large gatherings
+4. School closures 
+5. Limits on bars and restaurants 
 
-To answer our question, we want to see two major indices:
-First: ìwhen exactly a policy was enacted in a stateî 
-Second: ìhow much increase (as a ratio) were observed after the enactment timeî.†
+To answer our questions, we want to see two major indices:
+
+First: ‚Äúwhen exactly a policy was enacted in a state‚Äù 
+
+Second: ‚Äúhow much increase (as a ratio) were observed after the enactment time‚Äù¬†
 
 So, our visualization consists of two parts:
 The First part is the time of enacting a policy in each state.
 
 ![](img/pic_1.PNG)
 
-The horizontal axis is the time window and the vertical axis is the name of states and dots with different colors represents different policies 
-In this visualization we can easily see when each policy enacted in each state
+The horizontal axis is the time window and the vertical axis is the name of states and dots with different colors represent different policies. In this visualization we can easily see when each policy enacted in each state.
 
 The second part is to see what the variance is after enacting a policy. 
-To calculate the variance, we come up with our own measure called ìratio of increase after one weekî.
+To calculate the variance, we come up with our own measure called ‚Äúratio of increase after one week‚Äù.
 
 ![](img/pic_2.PNG)
 
